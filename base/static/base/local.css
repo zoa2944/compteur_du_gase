@@ -1,0 +1,136 @@
+:root {
+   --color1:#98a33e;
+   --color2:#c42e1f;
+   --color3:#dfa830;
+    --color1-light:#cdd590;
+    --color2-light:#ea847b;
+    --color3-light:#eac77b;
+    --color-array-even:#ffffff;
+    --color-array-odd:#e6e6e6;
+    --primary: #000;
+    --chartColor1: #c42e1f;
+    --chartColor2: #dfa830;
+    --chartColor3: #98a33e;
+    --chartColor4: #c42e1f;
+    --chartColorText: #c42e1f;
+}
+
+a:visited {
+    color: var(--color2);
+    font-weight: bold;
+}
+a:link {
+    color: var(--color2);
+    font-weight: bold;
+}
+a:hover {
+    color: var(--color2);
+    font-weight: bold;
+}
+
+ nav {
+    background-color: transparent;
+    font-weight: bold;
+ }
+
+.nav-tabs{
+  display:inline-flex;
+}
+
+.nav.nav-tabs{
+    display: inline-flex;
+    border: 2px none red !important;
+    border-bottom: 2px solid var(--color2) !important;
+}
+
+
+.nav-item.nav-link {
+  color: var(--color1);
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+ul.nav a {
+    border-width: 2px !important;
+    border-left-style: none;
+    border-right-style: none;
+    border-top-style: none;
+    border-bottom: 2px none transparent !important;
+}
+
+ul.nav a:hover {
+  color: var(--color2) !important;
+  border-color: var(--color2) !important;
+  border-width: 2px !important;
+}
+
+.btn {
+  border-width: 0px !important;
+}
+
+.btn-info, .btn-info:active, .btn-info:visited {
+    background-color: var(--color3) !important;
+}
+.btn-info:hover {
+    background-color: var(--color2) !important;
+}
+.btn-info.focus, .btn-info:focus {
+    outline: 0;
+    box-shadow: none!important;
+}
+
+.btn-light, .btn-light:active, .btn-light:visited {
+    background-color: var(--color1) !important;
+}
+.btn-light:hover {
+    background-color: var(--color2) !important;
+}
+.btn-light.focus, .btn-light:focus {
+    outline: 0;
+    box-shadow: none!important;
+}
+
+.btn-secondary, .btn-secondary:active, .btn-secondary:visited {
+    background-color: var(--color1) !important;
+}
+.btn-secondary:hover {
+    background-color: var(--color2) !important;
+}
+.btn-secondary.focus, .btn-secondary:focus {
+    outline: 0;
+    box-shadow: none!important;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  height: calc(1.5em  0.75rem  2px);
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid var(--color2);
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control.focus, .form-control:focus {
+    outline: 0;
+    box-shadow: none!important;
+    border-color: var(--color3);
+}
+
+.table-striped>tbody>tr:nth-child(odd)>td,
+.table-striped>tbody>tr:nth-child(odd)>th {
+    background-color: var(--color-array-odd);
+}
+
+.table-striped>tbody>tr:nth-child(even)>td,
+.table-striped>tbody>tr:nth-child(even)>th {
+    background-color: var(--color-array-even);
+}
+
+
