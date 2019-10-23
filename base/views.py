@@ -897,7 +897,7 @@ def inventory(request):
         if form.is_valid():
             for p, q in form.cleaned_data.items():
                 pdt = Product.objects.get(pk=p)
-                if q:
+                if q is not None:
                     diff = q - pdt.stock
                     if diff != 0:  # todo check
                         op = ChangeStockOp.create_inventory(product=pdt, quantity=diff)
