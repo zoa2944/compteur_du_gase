@@ -385,7 +385,6 @@ def appro(request, provider_id):
                     pdt.stock += q
                     pdt.save()
                     ref = pdt.get_email_stock_alert()
-                    print(ref)
                     if ref:
                         msgs[ref] = msgs.get(ref, '') + '{} a été approvisionné de {} unités\n'.format(pdt, q)
             messages.success(request, '✔ Approvisionnement effectué')
@@ -495,8 +494,6 @@ def purchaseslist(request):
         purchases.append({"date": date.isoformat(), "jour": date.day, "mois": date.month, "année": date.year,
                           'prix moyen du panier': '{0:.2f} €'.format(mean_baskets), 'nombre de paniers': len(baskets),
                           'total': '{0:.2f} €'.format(total_baskets)})
-
-    print(purchases)
 
     columns = json.dumps(columns)
     purchases = json.dumps(purchases)
@@ -792,7 +789,7 @@ def create_note(request):
 
 def detail_note(request, note_id):
     pdt = Note.objects.get(pk=note_id)
-    print(note_id)
+
     if request.method == 'POST':
         form = NoteForm(request.POST, instance=pdt)
         if form.is_valid():
@@ -913,8 +910,6 @@ def inventory(request):
 
 def ecarts(request):
     ope = ChangeStockOp.objects.filter(label='Inventaire')
-    for o in list(ope):
-        print(o.date, o.price)
     dates = {o.date.date() for o in ope}  # on regroupe par jour
     dates = sorted(dates, reverse=True)[:10]  # on garde les 10 derniers
     ecarts_data = [{'date': d,
