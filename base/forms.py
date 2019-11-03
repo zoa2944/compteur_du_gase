@@ -25,6 +25,7 @@ class ApproCompteForm(forms.Form):
                                 help_text="♥ Merci de ne pas oublier d'encaisser l'argent !",
                                 decimal_places=2)
 
+
 class ApproCompteFormKind(ApproCompteForm):
     kind = forms.ChoiceField(label="Type d'approvisionnement", choices=ApproCompteOp.KIND_CHOICES,
                              help_text="Chèque ou espèces pour un approvisionnement normal (valeur positive)."
@@ -32,7 +33,6 @@ class ApproCompteFormKind(ApproCompteForm):
                                        "de saisie (valeur positive ou négative)."
                                        "</br>Remboursement pour un remboursement ou "
                                        "lorsque le foyer clotûre son compte (valeur négative).")
-
 
 
 # utilisé pour inventaire ET appro stock
@@ -49,12 +49,17 @@ class ProductList(forms.Form):
             self.fields[str(p.pk)] = forms.DecimalField(label=p.name, help_text=mark_safe(help_text), required=False)
 
 
+class ProductListSimple(forms.Form):
+    product = forms.ModelChoiceField(label='Sélectionnez un produit : ',
+                                     queryset=Product.objects.order_by('name'))
+
+
 # used for details AND creation
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         exclude = ['activated']
-        widgets = { 'comment': Textarea(attrs={'rows': 4}) }
+        widgets = {'comment': Textarea(attrs={'rows': 4})}
 
 
 class ProductFormWithoutPurchase(ProductForm):
@@ -86,6 +91,7 @@ class ActivityForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['description'].widget.attrs['readonly'] = True
         self.fields['date'].widget.attrs['readonly'] = True
+
     class Meta:
         model = Activity
         exclude = []
@@ -94,3 +100,17 @@ class ActivityForm(forms.ModelForm):
             'volunteer1': Select2(select2attrs=settings.SELECT2_ATTRS),
             'volunteer2': Select2(select2attrs=settings.SELECT2_ATTRS),
         }
+
+
+class ApprosList(forms.Form):
+    def __init__(self, appros, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for a in appros:
+            help_text = "date : {} <br />" \
+                        "quantité réceptionnée : {} {} <br />" \
+                        "stock après réception : {} {}".format(a.date.strftime("%d/%m/%Y"),
+                                                               a.quantity, a.product.unit,
+                                                               a.stock, a.product.unit)
+            self.fields[str(a.pk)] = forms.DecimalField(
+                label="Quantité réceptionnée à la date du {} ?".format(a.date.strftime("%d/%m/%Y")),
+                help_text=mark_safe(help_text), required=False)
