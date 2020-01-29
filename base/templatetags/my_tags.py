@@ -46,6 +46,7 @@ def bool_to_utf8(b):
     else:
         return "✘"
 
+
 @register.filter
 def print_quantity(quantity, unit=None):
     q = round_stock(quantity)
@@ -57,12 +58,14 @@ def print_quantity(quantity, unit=None):
     else:
         return q
 
+
 @register.filter
 def print_quantity_op(op):
     if op.product is not None:
         return print_quantity(op.quantity, op.product.unit)
     else:
         return print_quantity(op.quantity)
+
 
 @register.filter
 def print_neg_quantity_op(op):
