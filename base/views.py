@@ -15,7 +15,6 @@ from .forms import *
 from .templatetags.my_tags import *
 
 
-
 def my_send_mail(request, subject, message, recipients, kind):
     local_settings = get_local_settings()
     if (local_settings.use_mail and recipients):
@@ -56,9 +55,9 @@ def index(request):
     activity_list = Activity.objects.filter(date__gte=date.today()).order_by('date')
 
     protect_personal_data = (
-        settings.YNH_INTEGRATION_ENABLED
-        and
-        request.user.is_anonymous
+            settings.YNH_INTEGRATION_ENABLED
+            and
+            request.user.is_anonymous
     )
 
     return render(request, 'base/index.html',
@@ -68,7 +67,7 @@ def index(request):
                    'activity_board': local_settings.activity_board,
                    'activity_list': activity_list,
                    'use_logo': local_settings.use_logo,
-                   'protect_personal_data' : protect_personal_data,
+                   'protect_personal_data': protect_personal_data,
                    })
 
 
@@ -153,8 +152,10 @@ def achats(request, household_id):
         msg += "Ce qui nous donne un total de {} €.\n\nCiao!".format(s)
         balance = household.account
         messages.success(request, '✔ Votre cagnotte a été débitée de {} €<br>Solde restant : {} €'.format(round2(s),
-                                                                                                       round2(balance)))
-        my_send_mail(request, subject='Ticket de caisse', message=msg, recipients=household.get_emails_receipt(), kind=Mail.TICKET)
+                                                                                                          round2(
+                                                                                                              balance)))
+        my_send_mail(request, subject='Ticket de caisse', message=msg, recipients=household.get_emails_receipt(),
+                     kind=Mail.TICKET)
         return HttpResponseRedirect(reverse('base:index'))
     else:
         local_settings = get_local_settings()
@@ -318,12 +319,14 @@ def detail_product(request, product_id):
             form = ProductFormWithoutPurchase(instance=pdt)
     return render(request, 'base/detail_product.html', {'pdt': pdt, 'stock_value': pdt.value_stock(), 'form': form})
 
+
 def archive_product(request, product_id):
     pdt = get_object_or_404(Product, pk=product_id)
     pdt.activated = False
     pdt.save()
     messages.success(request, '✔ {} archivé !'.format(pdt.name))
     return HttpResponseRedirect(reverse('base:products'))
+
 
 def product_history(request, product_id):
     operations = [{"label": str(p.label), "date": str(p.date), "quantity": str(p.quantity), "price": str(p.price)}
@@ -343,9 +346,11 @@ def products(request):
         columns = ['nom', 'catégorie', 'fournisseur', 'prix', 'vrac', 'visible', 'alerte stock', 'stock']
     pdts = [{"id": p.id, "nom": p.name, "catégorie": str(p.category), "fournisseur": str(p.provider),
              "prix d'achat": '{} € / {}'.format(p.cost_of_purchase, p.unit.name),
-             "prix de vente": '{} € / {}'.format(p.price, p.unit.name), "prix": '{} € / {}'.format(p.price, p.unit.name),
+             "prix de vente": '{} € / {}'.format(p.price, p.unit.name),
+             "prix": '{} € / {}'.format(p.price, p.unit.name),
              "visible": bool_to_utf8(p.visible), "vrac": bool_to_utf8(p.unit.vrac),
-             "alerte stock": '{} [{}]'.format(bool_to_utf8(p.stock < p.stock_alert), round_stock(p.stock_alert)) if (p.stock_alert) else '',
+             "alerte stock": '{} [{}]'.format(bool_to_utf8(p.stock < p.stock_alert), round_stock(p.stock_alert)) if (
+                 p.stock_alert) else '',
              "stock": round_stock(p.stock)}
             for p in Product.objects.all()]
     columns = json.dumps(columns)
@@ -391,7 +396,8 @@ def appro(request, provider_id):
                         msgs[ref] = msgs.get(ref, '') + '{} a été approvisionné de {} unités\n'.format(pdt, q)
             messages.success(request, '✔ Approvisionnement effectué')
             for (key, value) in msgs.items():
-                my_send_mail(request, subject='Approvisionnement : {}'.format(prov), message=value, recipients=[key], kind=Mail.APPRO_STOCK)
+                my_send_mail(request, subject='Approvisionnement : {}'.format(prov), message=value, recipients=[key],
+                             kind=Mail.APPRO_STOCK)
             return HttpResponseRedirect(reverse('base:index'))
     else:
         form = ProductList(pdts)
@@ -434,15 +440,17 @@ def pre_appro_cor(request, product_id):
                     # mail
                     ref = pdt.get_email_stock_alert()
                     if ref:
-                        msgs[ref] = msgs.get(ref, '') + 'L\'approvisionnement de {} a été modifié ' \
-                                                        'et fixé à {} unités ' \
-                                                        'au lieu de {} unités\n'.format(pdt, q,q_old)
+                        for refi in ref:
+                            msgs[refi] = msgs.get(refi, '') + ('L\'approvisionnement de {} a été modifié .'
+                                                              'Il est fixé à {} unités '
+                                                              'au lieu de {} unités\n').format(str(pdt), q, q_old)
             messages.success(request, '✔ Approvisionnement modifié')
             for (key, value) in msgs.items():
-                my_send_mail(request, subject='Approvisionnement', message=value, recipient_list=[key],
-                             success_msg='Mail de confirmation envoyé au référent',
-                             error_msg='Erreur : le mail de confirmation n\'a pas été envoyé',
-                             kind=Mail.REFERENT)
+                my_send_mail(request,
+                             subject='Approvisionnement',
+                             message=value,
+                             recipients=[key],
+                             kind=Mail.ALERTE_STOCK)
             return HttpResponseRedirect(reverse('base:index'))
     else:
         form = ApprosList(appros)
@@ -457,7 +465,8 @@ def approslist(request):
     columns = ['jour', 'mois', 'année', 'fournisseur', 'produit', "coût total (prix de vente)"]
     if use_cost_of_purchase:
         columns.append("coût total (prix d'achat)")
-    appros = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "fournisseur": str(p.product.provider if p.product else "Produit supprimé"),
+    appros = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year,
+               "fournisseur": str(p.product.provider if p.product else "Produit supprimé"),
                "produit": str(p.product), "coût total (prix d'achat)": '{0:.2f} €'.format(p.cost_of_purchase()),
                "coût total (prix de vente)": '{0:.2f} €'.format(p.cost_of_price()),
                "date": p.date.isoformat()}
@@ -473,7 +482,7 @@ def approslist(request):
 def get_appros_stats(use_cost_of_purchase):
     # dates
     ops = ChangeStockOp.objects.filter(label="ApproStock")
-    dates = sorted({ p.date.date() for p in ops } | {date.today()})
+    dates = sorted({p.date.date() for p in ops} | {date.today()})
 
     # value
     values = [0] * len(dates)
@@ -970,37 +979,46 @@ def database_info(request):
 
 from .exports import *
 
+
 def export_households(request):
     with NamedTemporaryFile() as tmp:
         generate_export_households(tmp.name)
         tmp.seek(0)
-        response = HttpResponse(tmp.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response = HttpResponse(tmp.read(),
+                                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = 'attachment; filename=export_foyers.xlsx'
         return response
+
 
 def export_products(request):
     with NamedTemporaryFile() as tmp:
         generate_export_products(tmp.name)
         tmp.seek(0)
-        response = HttpResponse(tmp.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response = HttpResponse(tmp.read(),
+                                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = 'attachment; filename=export_produits.xlsx'
         return response
+
 
 def export_providers(request):
     with NamedTemporaryFile() as tmp:
         generate_export_providers(tmp.name)
         tmp.seek(0)
-        response = HttpResponse(tmp.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response = HttpResponse(tmp.read(),
+                                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = 'attachment; filename=export_fournisseurs.xlsx'
         return response
+
 
 def export_inventory(request):
     with NamedTemporaryFile() as tmp:
         generate_export_inventory(tmp.name)
         tmp.seek(0)
-        response = HttpResponse(tmp.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response = HttpResponse(tmp.read(),
+                                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = 'attachment; filename=bilan_inventaires.xlsx'
         return response
+
 
 def ecarts(request):
     return render(request, 'base/ecarts.html', {'ecarts': generate_ecarts_data()})
